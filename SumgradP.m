@@ -1,0 +1,41 @@
+function grad = SumgradP(M,R,fc1,fc2,fc3,rm1,rm2,rm3,rb1,rb2,rb3,ym1,ym2,ym3,f,beta)
+M = length(beta);
+RmES = rm1;
+YmES = ym1;
+RbES = RmES - YmES;
+fcES = fc1;
+fES = f;
+FES = fES/fcES;
+Rmj = rm2;
+Ymj = ym2;
+Rbj = Rmj - Ymj;
+fcj = fc2;
+fj = f;
+Fj = fj/fcj;
+RmF = rm3;
+YmF = ym3;
+RbF = RmF - YmF;
+fcF = fc3;
+fF = f;
+FF = fF/fcF;
+dGamma = RbES*(1-(R/RbES*cos(beta)).^2).^-0.5.*-(R/RbES)*2.*cos(beta).*sin(cos(beta));
+%term 1
+betaES = beta;
+[A B C] = QP_ABC(R,RmES,RbES,YmES,FES,betaES,0);
+layer1 = gradP(A,B,C,R,betaES,RmES,RbES,0);
+[Lower] = penetrate(Rmj,Rbj,Fj,Ymj,R,1);
+betaj = Lower + 0.1;
+[A B C] = QP_ABC(R,Rmj,Rbj,Ymj,Fj,betaj,1);
+Lower = acos(sqrt(-((B^2-(2*A*Rbj+B)^2)/4/A+(Rbj*Rmj/Fj/Ymj)^2)/R^2));
+betaj = (Lower + 0.000001)*ones(1,M);
+[A B C] = QP_ABC(R,Rmj,Rbj,Ymj,Fj,betaj,1);
+[betaj, tol] = angle(R,RmES,RbES,FES,YmES,betaES,0,Rmj,Rbj,Fj,Ymj,betaj,1);
+layer2 = gradP(A,B,C,R,betaj,Rmj,Rbj,1);
+
+[Lower] = penetrate(RmF,RbF,FF,YmF,R,0);
+betaF = Lower*ones(1,M);
+[betaF tol]= angle(R,RbF,Rbj,Fj,Ymj,betaj,1,RmF,RbF,FF,YmF,betaF,0);
+[A B C] = QP_ABC(R,RmF,RbF,YmF,FF,betaF,0);
+[layer3, ~] = graPD(A,B,C,betaF,R,RbF);
+grad = dGamma  - R*cos(beta) + layer1 + layer2 + layer3;
+end
