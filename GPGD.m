@@ -4,7 +4,7 @@
 %mo is the momentum parameter and distance
 function [x beta obj] = GPGD(M,R,G,tau,inv_Omega,Lower,Upper,max_dis,min_dis,XYZ,n,p_P,p_D)
         thres = 20;
-        mo = 1.05;
+        mo = 1.1;
         ss = 1e-2;
         x = [];
         x = Initialization(XYZ,max_dis,min_dis,M,inv_Omega,G,tau,R,Upper,Lower,x,n,p_P,p_D);
@@ -56,7 +56,7 @@ function [x beta obj] = GPGD(M,R,G,tau,inv_Omega,Lower,Upper,max_dis,min_dis,XYZ
                 x(1:2) = x(1:2)/norm(x(1:2))*R*0.99;
             end
             x(3) = sqrt(R^2 - (x(1)^2+x(2)^2));
-            for i =1:20
+            for i =1:5
                 for k = 1:M               
                     beta = solve_eq_fast(R,beta,XYZ,x,k,n,p_P,p_D);
                 end
@@ -78,7 +78,7 @@ function [x beta obj] = GPGD(M,R,G,tau,inv_Omega,Lower,Upper,max_dis,min_dis,XYZ
             obj = (G*P'-tau')'*inv_Omega*(G*P'-tau');
             if obj<1000
                 thres = 5;
-                mo = 1.005;
+                mo = 1.05;
             end
             fprintf("obj:%2.2f step size:%2.6f\n",obj,ss);        
             if obj_min>obj

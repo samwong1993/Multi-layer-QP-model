@@ -15,7 +15,7 @@ else if abs(dif)>abs(dif_old)
     ss = -ss;
     end
 end
-if abs(dif)<1e-5
+if abs(dif)<1e-9
     break
 end
 

@@ -9,7 +9,7 @@ for i = 1 : n
     err_mean(i) = sqrt(sum(error(:,i).^2)/m);
 end
 err_mean = mean(error);
-plot(sigma,10^3*err_mean,fig, 'linewidth', 1.1)
+plot(sigma,10^3*err_mean,fig, 'linewidth', 1.5)
 hold on
 for i = 1:m
     plot(sigma,10^3*error(i,:),'b--o') 

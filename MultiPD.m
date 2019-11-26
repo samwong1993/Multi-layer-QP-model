@@ -55,5 +55,6 @@ betaF = angle(R,RbF,Rbj,Fj,Ymj,betaj,1,RmF,RbF,FF,YmF,betaF,0);
 [PF DF] = ionosphere(R,RbF,RmF,YmF,A,B,C,betaF,0);
 P = PES + Pj + PF;
 D = DES + Dj + DF;
+end
 % fprintf("betaES: %2.4f,betaj: %2.4f,betaF: %2.4f\n",betaES,betaj,betaF);
 %save ionosphere

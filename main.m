@@ -52,17 +52,17 @@ beta0 = [0.363735916327494,0.462185130143162,0.303344375146732,0.252043292085888
 % [emitter,XYZ,beta0] = generator(M,R,fc1,fc2,fc3,rm1,rm2,rm3,rb1,rb2,rb3,ym1,ym2,ym3,f,max_dis,min_dis,Lower,Upper);
 beta = beta0;
 x = emitter';
-[P D] = SumPD(R,fc1,fc2,fc3,rm1,rm2,rm3,rb1,rb2,rb3,ym1,ym2,ym3,f,beta);
-for k = 1:M
-    penalty(k) = norm(XYZ(k,:)-x,2)^2 - 4*R^2*(1 - cos(D(k)/R))/2;
-end
+% [P D] = SumPD(R,fc1,fc2,fc3,rm1,rm2,rm3,rb1,rb2,rb3,ym1,ym2,ym3,f,beta);
+% for k = 1:M
+%     penalty(k) = norm(XYZ(k,:)-x,2)^2 - 4*R^2*(1 - cos(D(k)/R))/2;
+% end
 N = M*(M-1)/2;
 Omega = 0.5*(ones(N,N) + eye(N));
 inv_Omega = Omega^-1;
 [G] = generate_G(N,M);
 sigma = [0:100:1000];
-for index = 25:30
-for noise_level = 1:length(sigma)
+for index = 1
+for noise_level = 1%1:length(sigma)
 sigma_t = sigma(noise_level)* 10^-9 * 3 * 10^5 ;
 noise_t0 = randn(M,1);
 noise_t = (sigma_t*G*noise_t0)';
