@@ -14,7 +14,7 @@ x0 = x;
 beta = 0.5*(Lower + Upper)*ones(1,M);
 for i =1:5
     for k = 1:M
-        beta = solve_eq_fast(R,beta,XYZ,x,k,n,p_P,p_D);
+        beta = solve_eq_fast(R,beta,XYZ,x,k,n,p_P,p_D,Lower,Upper);
     end
 end
 beta(beta<Lower) = Lower;
@@ -25,7 +25,7 @@ center = R*sum(XYZ)/M/(norm(sum(XYZ)/M));
 x_ini = 2*(center*(x'/R)*center/R - x) + x;
 for i =1:5
     for k = 1:M
-        beta = solve_eq_fast(R,beta,XYZ,x_ini,k,n,p_P,p_D);
+        beta = solve_eq_fast(R,beta,XYZ,x_ini,k,n,p_P,p_D,Lower,Upper);
     end
 end
 beta(beta<Lower) = Lower;
@@ -44,7 +44,7 @@ if ~isempty(x_input)
     beta = 0.5*(Lower + Upper)*ones(1,M);
     for i =1:5
         for k = 1:M
-            beta = solve_eq_fast(R,beta,XYZ,x_input,k,n,p_P,p_D);
+            beta = solve_eq_fast(R,beta,XYZ,x_input,k,n,p_P,p_D,Lower,Upper);
         end
     end
     beta(beta<Lower) = Lower;

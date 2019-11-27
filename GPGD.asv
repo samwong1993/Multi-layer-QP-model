@@ -28,9 +28,8 @@ function [x beta obj] = GPGD(M,R,G,tau,inv_Omega,Lower,Upper,max_dis,min_dis,XYZ
             S = XYZ;
             dBeta = zeros(M, 2);
             for i = 1:M
-                dBeta(i,1) = -(S(i,1) - x(1))/R/sin(D(i)/R)/gradD(i);
-                dBeta(i,2) = -(S(i,2) - x(2))/R/sin(D(i)/R)/gradD(i);
-                dBeta(i,3) = -(S(i,3) - x(3))/R/sin(D(i)/R)/gradD(i);
+                dBeta(i,1) = -(S(i,1) - S(i,3)*x(1)/x(3))/R/sin(D(i)/R)/gradD(i);
+                dBeta(i,2) = -(S(i,2) - S(i,3)*x(2)/x(3))/R/sin(D(i)/R)/gradD(i);
             end
             %Newton method
 %             [hessP, hessD] = hessPD(A,B,C,beta,R,Rb);
@@ -38,6 +37,7 @@ function [x beta obj] = GPGD(M,R,G,tau,inv_Omega,Lower,Upper,max_dis,min_dis,XYZ
 %             dP_x = (2*G'*inv_Omega*(G*P'-tau'))'.*(invH*graP')'*dBeta;
             %Gradient descent
             dP_x = (2*G'*inv_Omega*(G*P'-tau'))'.*gradP*dBeta;
+            dP_x(3) = 0;
             while(1)
                 if ss*max(abs(dP_x))>thres
                     ss = 0.5*ss;
@@ -46,20 +46,40 @@ function [x beta obj] = GPGD(M,R,G,tau,inv_Omega,Lower,Upper,max_dis,min_dis,XYZ
                 end
             end
             x = x - ss*dP_x;
+            if isnan(x(1))
+                break
+            end
             ss = ss*mo;
-            x = x/norm(x)*R;
+            if norm(x(1:2))>=R
+                x(x>R) = R;
+                x(x<-R) = -R;
+                x(1:2) = x(1:2)/norm(x(1:2))*R*0.99;
+            end
+            x(3) = sqrt(R^2 - (x(1)^2+x(2)^2));
             for i =1:1
                 for k = 1:M               
                     beta = solve_eq_fast(R,beta,XYZ,x,k,n,p_P,p_D,Lower,Upper);
                 end
             end
+            if min([abs(beta-Lower),abs(beta-Upper)])<1e-5
+                if norm(x(1:2))>=R
+                    x(1:2) = x(1:2)/norm(x(1:2))*R;
+                end
+                x(3) = - sqrt(R^2 - (x(1)^2+x(2)^2));
+                for i =1:1
+                    for k = 1:M
+                        beta = solve_eq_fast(R,beta,XYZ,x,k,n,p_P,p_D,Lower,Upper);
+                    end
+                end
+            end
+            x
             beta(beta<Lower) = Lower;
             beta(beta>Upper) = Upper;
             [P gradP D gradD] = build_PD(p_P,p_D,n,beta);
             obj = (G*P'-tau')'*inv_Omega*(G*P'-tau');
             if obj<1000
                 thres = 1;
-                mo = 1.02;
+                mo = 1.05;
             end
             fprintf("obj:%2.2f step size:%2.6f\n",obj,ss);        
             if obj_min>obj

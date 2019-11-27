@@ -101,6 +101,7 @@ xlabel('\beta')
 ylabel('Function Value')
 legend('True D','Estmated D')
 %save('fit.mat','betatmp','Ptmp','Dtmp')
-norm(Ptmp - Pval)
-norm(Dtmp - Dval)
+fprintf("acc_P:%2.2f,acc_D:%2.2f\n",norm(Ptmp - Pval),norm(Dtmp - Dval));
+
+
 end

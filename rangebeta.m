@@ -1,7 +1,7 @@
 %% Calculate range for flying angle
 %created by Huang Sen
 %Email: huangsen1993@gmail.com
-function [beta0] = rangebeta(R,fc1,fc2,fc3,rm1,rm2,rm3,rb1,rb2,rb3,ym1,ym2,ym3,f)
+function [betaL] = rangebeta(R,fc1,fc2,fc3,rm1,rm2,rm3,rb1,rb2,rb3,ym1,ym2,ym3,f)
 a1 = fc1^2;
 a2 = a1;
 a3 = fc3^2;
@@ -17,41 +17,19 @@ fcES = fc1;
 fES = f;
 FES = fES/fcES;
 [Upper] = penetrate(RmES,RbES,FES,YmES,R,0);
-beta0 = Upper+0.0001;
+betaL = Upper+0.0001;
+betaU = pi/2;
+betaM = 0.5*(betaL + betaU);
 for iter = 1:1000
-betaES = beta0;
-[A B C] = QP_ABC(R,RmES,RbES,YmES,FES,betaES,0);
-%Joining layer
-Rmj = rm2;
-Ymj = ym2;
-Rbj = Rmj - Ymj;
-fcj = fc2;
-fj = f;
-Fj = fj/fcj;
-[Lower] = penetrate(Rmj,Rbj,Fj,Ymj,R,1);
-betaj = Lower + 0.1;
-[A B C] = QP_ABC(R,Rmj,Rbj,Ymj,Fj,betaj,1);
-Lower = acos(sqrt(-((B^2-(2*A*Rbj+B)^2)/4/A+(Rbj*Rmj/Fj/Ymj)^2)/R^2));
-betaj = Lower + 0.000001;
-[A B C] = QP_ABC(R,Rmj,Rbj,Ymj,Fj,betaj,1);
-[betaj tol] = angle(R,RmES,RbES,FES,YmES,betaES,0,Rmj,Rbj,Fj,Ymj,betaj,1);
-%F layer
-RmF = rm3;
-YmF = ym3;
-RbF = RmF - YmF;
-fcF = fc3;
-fF = f;
-FF = fF/fcF;
-[~,~,Lower] = beta_bound(1,FF,R,RbF,RmF,YmF);
-betaF = Lower;
-[betaF tol]= angle(R,RbF,Rbj,Fj,Ymj,betaj,1,RmF,RbF,FF,YmF,betaF,0);
-if abs(betaF-Lower)>1e-5&tol<1e-5
-    beta0 = 1.01*beta0;
+betaM = 0.5*(betaL + betaU);
+[betaFM tolM LowerM] = bisection(R,fc1,fc2,fc3,rm1,rm2,rm3,rb1,rb2,rb3,ym1,ym2,ym3,f,betaM);
+if abs(betaFM-LowerM)>1e-5&tolM<1e-5
+    betaL = betaM;
 end
-if abs(betaF-Lower)<1e-5&tol>1e-5
-    beta0 = 0.999*beta0;
+if abs(betaFM-LowerM)<1e-5&tolM>1e-5
+    betaU = betaM;
 end
-if abs(betaF-Lower)<1e-5&tol<1e-5
+if abs(betaFM-LowerM)<1e-5&tolM<1e-5
     break;
 end
 end   

@@ -14,21 +14,12 @@ while(1)
 end
 end
 %Calculate corresponing beta of x
-while(1)
 beta = 0.5*(Lower+Upper)*ones(1,M);
 x = emitter';
-for i =1:5
+for i =1:1
     for k = 1:M
         beta = solve_eq(R,fc1,fc2,fc3,rm1,rm2,rm3,rb1,rb2,rb3,ym1,ym2,ym3,f,beta,XYZ,x,k,Lower,Upper);
     end
 end
-[P D] = SumPD(R,fc1,fc2,fc3,rm1,rm2,rm3,rb1,rb2,rb3,ym1,ym2,ym3,f,beta);
-for k = 1:M
-    penalty(k) = norm(XYZ(k,:)-x,2) - 2* R*sin(D(k)/2/R);
-end
 beta0 = beta;
-if sum(penalty) < 1e-2
-    break;
-end
-end
 end

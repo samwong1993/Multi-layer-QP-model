@@ -2,12 +2,11 @@
 %created by Huang Sen
 %Email: huangsen1993@gmail.com
 function beta = solve_eq(R,fc1,fc2,fc3,rm1,rm2,rm3,rb1,rb2,rb3,ym1,ym2,ym3,f,beta,XYZ,x,k,Lower,Upper)
-ss = 0.001;
 betaL = Lower;
 betaU = Upper;
 dis = norm(XYZ(k,:)-x,2);
 beta0 = beta;
-for i = 1:100
+for i = 1:1000
     [P D] = SumPD(R,fc1,fc2,fc3,rm1,rm2,rm3,rb1,rb2,rb3,ym1,ym2,ym3,f,betaL);
     dL = 2* R*sin(D/2/R);
     [P D] = SumPD(R,fc1,fc2,fc3,rm1,rm2,rm3,rb1,rb2,rb3,ym1,ym2,ym3,f,betaU);
@@ -20,7 +19,7 @@ for i = 1:100
     else 
         betaU = betaM;
     end
-    if abs(betaU-betaL)<1e-9
+    if abs(betaU-betaL)<1e-12
         beta = beta0;
         beta(k) = 0.5*(betaL + betaU);
         break
