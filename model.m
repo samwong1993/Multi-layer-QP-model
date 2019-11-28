@@ -64,14 +64,14 @@ end
 P = [P MultiP];
 D = [D MultiD];
 beta = [beta beta0];
-figure(1)
-plot(beta(1:length(P)),P, 'r--', 'linewidth', 1.5)
-hold on
-plot(beta(1:length(D)),D, 'b:', 'linewidth', 1.5)
-xlabel('\beta')
-ylabel('Function Value')
-legend('P','D')
-xlim([min(beta(1:length(P))) max(beta(1:length(P)))])
+% figure(1)
+% plot(beta(1:length(P)),P, 'r--', 'linewidth', 1.5)
+% hold on
+% plot(beta(1:length(D)),D, 'b:', 'linewidth', 1.5)
+% xlabel('\beta')
+% ylabel('Function Value')
+% legend('P','D')
+% xlim([min(beta(1:length(P))) max(beta(1:length(P)))])
 %fit the function P
 [min_dis max_dis Lower Upper] = range(R,fc1,fc2,fc3,rm1,rm2,rm3,rb1,rb2,rb3,ym1,ym2,ym3,f);
 betatmp = beta(1:length(D));
@@ -93,13 +93,13 @@ for i =1:length(Dtmp)
         Dval(i) = Dval(i) + p_D(j)*betatmp(i)^(n+1-j);
     end
 end
-figure(2)
-plot(betatmp,Dtmp,'k--', 'linewidth',2)
-hold on
-plot(betatmp,Dval,'r-','linewidth', 0.5)
-xlabel('\beta')
-ylabel('Function Value')
-legend('True D','Estmated D')
+% figure(2)
+% plot(betatmp,Dtmp,'k--', 'linewidth',2)
+% hold on
+% plot(betatmp,Dval,'r-','linewidth', 0.5)
+% xlabel('\beta')
+% ylabel('Function Value')
+% legend('True D','Estmated D')
 %save('fit.mat','betatmp','Ptmp','Dtmp')
 fprintf("acc_P:%2.2f,acc_D:%2.2f\n",norm(Ptmp - Pval),norm(Dtmp - Dval));
 

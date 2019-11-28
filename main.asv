@@ -59,7 +59,7 @@ M = 5;
 n = 20;
 [p_P p_D] = model(R,fc1,fc2,fc3,rm1,rm2,rm3,rb1,rb2,rb3,ym1,ym2,ym3,f,n);
 [min_dis max_dis Lower Upper] = range(R,fc1,fc2,fc3,rm1,rm2,rm3,rb1,rb2,rb3,ym1,ym2,ym3,f);
-%Hong Kong
+% %Hong Kong
 [x0 y0 z0] = LGLTtoXYZ(114.16,22.28,R);
 emitter = [x0 y0 z0]';
 %Chong Qing
@@ -77,6 +77,7 @@ XYZ(4,:) = [x0 y0 z0];
 %Kun Ming
 [x0 y0 z0] = LGLTtoXYZ(102.83,24.88,R);
 XYZ(5,:) = [x0 y0 z0];
+% beta0 = [0.363735916327494,0.462185130143162,0.303344375146732,0.252043292085888,0.317003312557548];
 beta0 = [0.363735916581471,0.462185130510566,0.303344375159694,0.252043292174790,0.317003313068478];
 %[emitter,XYZ,beta0] = generator(M,R,fc1,fc2,fc3,rm1,rm2,rm3,rb1,rb2,rb3,ym1,ym2,ym3,f,max_dis,min_dis,Lower,Upper);
 beta = beta0;
@@ -91,13 +92,21 @@ N = M*(M-1)/2;
 Omega = 0.5*(ones(N,N) + eye(N));
 inv_Omega = Omega^-1;
 [G] = generate_G(N,M);
-tau = generate_tau(M,R,fc1,fc2,fc3,rm1,rm2,rm3,rb1,rb2,rb3,ym1,ym2,ym3,f,beta0);
-[x beta obj] = GPGD(M,R,G,tau,inv_Omega,Lower,Upper,max_dis,min_dis,XYZ,n,p_P,p_D,plt);
-dis = norm(x - emitter');
-fprintf("The distance to the emitter is: %2.2f km\n",dis)
-fprintf("%s\n",'Localization successful!')
-fprintf("True Location:(%2.2f,%2.2f,%2.2f)\n",emitter(1),emitter(2),emitter(3))
-fprintf("Location:(%2.2f,%2.2f,%2.2f)\n",x(1),x(2),x(3))
+sigma = [0:100:1000];
+for index = 1
+for noise_level = 1%1:length(sigma)
+sigma_t = sigma(noise_level)* 10^-9 * 3 * 10^5 ;
+noise_t0 = randn(M,1);
+noise_t = (sigma_t*G*noise_t0)';
+tau = generate_tau(M,R,fc1,fc2,fc3,rm1,rm2,rm3,rb1,rb2,rb3,ym1,ym2,ym3,f,beta0) + noise_t;
+%[tau] = generate_tau(M,R,fc1,fc2,fc3,rm1,rm2,rm3,rb1,rb2,rb3,ym1,ym2,ym3,f,beta);
+% [P D] = SumPD(R,fc1,fc2,fc3,rm1,rm2,rm3,rb1,rb2,rb3,ym1,ym2,ym3,f,beta);
+% obj = (G*P'-tau')'*inv_Omega*(G*P'-tau');
+tic
+[x beta obj] = GPGD(M,R,G,tau,inv_Omega,Lower,Upper,max_dis,min_dis,XYZ,n,p_P,p_D);
+toc
+dis = norm(x - emitter')
+fprintf(fid,"%2.2f,%d,%2.2f\n",noise_level,index,dis);
 %Output results
 if plt == 1
     scatter3(emitter(1),emitter(2),emitter(3),50,'filled','r')
@@ -112,6 +121,10 @@ for i = 1:M
     end
     fprintf("Sensor %d:(%2.2f,%2.2f,%2.2f)\n",i,XYZ(i,1),XYZ(i,2),XYZ(i,3))
 end
+fprintf("Non-Perturbated:r0:%2.2f km,Rm:%2.2f km,Ym:%2.2f km,fc:%2.2f MHz,f:%2.2f MHz\n",R,Rm,Ym,fc,f)
+fprintf("Perturbated: r0:%2.2f km,Rm:%2.2f km,Ym:%2.2f km,fc:%2.2f MHz,f:%2.2f MHz\n",R,P_Rm,P_Ym,P_fc,P_f)
+fprintf("True Location:(%2.2f,%2.2f,%2.2f)\n",emitter(1),emitter(2),emitter(3))
+fprintf("Location:(%2.2f,%2.2f,%2.2f)\n",x(1),x(2),x(3))
 fprintf("True Flying angle:(")
 for i = 1:M-1
     fprintf("%2.2f,",beta0(i))
@@ -122,8 +135,20 @@ for i = 1:M-1
     fprintf("%2.2f,",beta(i))
 end
 fprintf("%2.2f)\n",beta(M))
+[lg lt] = XYZtoLGLT(x(1),x(2),x(3),R);
+fprintf("The distance to the emitter is: %2.2f km\n",dis)
+fprintf("%s\n",'Localization successful!')
 %Lengend
 if plt == 1
 	h = legend([point1,point2,point3,point4,point5],'Emitter', 'Sensors', 'Initial Point','Estimated Location','Generated Points','AutoUpdate','off');
     %set(h,'box','off')
 end
+%plot ray path
+if plt == 1
+    for i = 1:M
+        raypath(emitter,XYZ(i,:),Rm,Rb,Ym,R);
+    end
+end
+end
+end
+%pltMCCRLB('realdata_log.txt','*k-')

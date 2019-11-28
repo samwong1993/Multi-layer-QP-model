@@ -2,12 +2,15 @@
 %created by Huang Sen
 %Email: huangsen1993@gmail.com
 %mo is the momentum parameter and distance
-function [x beta obj] = GPGD(M,R,G,tau,inv_Omega,Lower,Upper,max_dis,min_dis,XYZ,n,p_P,p_D)
+function [x beta obj] = GPGD(M,R,G,tau,inv_Omega,Lower,Upper,max_dis,min_dis,XYZ,n,p_P,p_D,plt)
         thres = 20;
         mo = 1.1;
         ss = 1e-2;
         x = [];
         x = Initialization(XYZ,max_dis,min_dis,M,inv_Omega,G,tau,R,Upper,Lower,x,n,p_P,p_D);
+        if plt == 1
+            scatter3(x(1),x(2),x(3),50,'filled','b')
+        end
         beta = 0.5*(Lower + Upper)*ones(1,M);
         for i =1:1
             for k = 1:M
@@ -48,6 +51,9 @@ function [x beta obj] = GPGD(M,R,G,tau,inv_Omega,Lower,Upper,max_dis,min_dis,XYZ
             x = x - ss*dP_x;
             ss = ss*mo;
             x = x/norm(x)*R;
+            if plt == 1
+                scatter3(x(1),x(2),x(3),5,'m')
+            end
             for i =1:1
                 for k = 1:M               
                     beta = solve_eq_fast(R,beta,XYZ,x,k,n,p_P,p_D,Lower,Upper);
