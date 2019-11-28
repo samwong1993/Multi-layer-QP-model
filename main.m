@@ -5,7 +5,7 @@ clear
 fid=fopen('realdata_log.txt','a+');
 R = 6371.2;
 %plt = 1 plot the earth,emitter,sensors and the generated sequence
-plt = 1;
+plt = 0;
 if plt == 1
     figure('color','k')
     %Add legend
