@@ -21,17 +21,17 @@ D1 = abs(delta2 - delta1);
 delta2 = ionosphere(R,Rb2,Rm1+acc,Ym2,A,B,C,beta2,joining2) - ionosphere(R,Rb2,Rm1,Ym2,A,B,C,beta2,joining2);
 D2 = abs(delta2 - delta1);
 [A B C] = QP_ABC(R,Rm2,Rb2,Ym2,F2,beta3,joining2);
-delta2 = ionosphere(R,Rb2,Rm1+acc,Ym2,A,B,C,beta3,joining2) - ionosphere(R,Rb2,Rm1,Ym2,A,B,C,beta3,joining2);
+delta2 = ionosphere(R,Rb2,Rm1+acc,Ym2,A,B,C,beta3,joining2);
 D3 = abs(delta2 - delta1);
 [A B C] = QP_ABC(R,Rm2,Rb2,Ym2,F2,beta4,joining2);
-delta2 = ionosphere(R,Rb2,Rm1+acc,Ym2,A,B,C,beta4,joining2) - ionosphere(R,Rb2,Rm1,Ym2,A,B,C,beta4,joining2);
+delta2 = ionosphere(R,Rb2,Rm1+acc,Ym2,A,B,C,beta4,joining2);
 D4 = abs(delta2 - delta1);
 index = D2<D3;
 beta4(index) = beta3(index);
 dif_index = ~index;
 beta1(dif_index) = beta2(dif_index);
 tol = norm(delta2 - delta1);
-if norm(D1-D2)<1e-5&&tol<1e-5
+if norm(D1-D2)<1e-6&&tol<1e-6
     break
 end
 end
