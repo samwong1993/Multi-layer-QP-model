@@ -2,7 +2,7 @@
 %created by Huang Sen
 %Email: huangsen1993@gmail.com
 clear
-fid=fopen('realdata_log.txt','a+');
+fid=fopen('exp/exp1.txt','a+');
 R = 6371.2;
 %Three layers
 fc1 = 4;
@@ -48,36 +48,24 @@ XYZ(4,:) = [x0 y0 z0];
 %Kun Ming
 [x0 y0 z0] = LGLTtoXYZ(102.83,24.88,R);
 XYZ(5,:) = [x0 y0 z0];
-% beta0 = [0.363735916327494,0.462185130143162,0.303344375146732,0.252043292085888,0.317003312557548];
 beta0 = [0.363735916581471,0.462185130510566,0.303344375159694,0.252043292174790,0.317003313068478];
 %[emitter,XYZ,beta0] = generator(M,R,fc1,fc2,fc3,rm1,rm2,rm3,rb1,rb2,rb3,ym1,ym2,ym3,f,max_dis,min_dis,Lower,Upper);
 beta = beta0;
 x = emitter';
-% [P D] = SumPD(R,fc1,fc2,fc3,rm1,rm2,rm3,rb1,rb2,rb3,ym1,ym2,ym3,f,beta);
-% for k = 1:M
-%     penalty(k) = norm(XYZ(k,:)-x,2) - 2* R*sin(D(k)/2/R);
-% end
-% penalty
-% obj = (G*P'-tau')'*inv_Omega*(G*P'-tau');
 N = M*(M-1)/2;
 Omega = 0.5*(ones(N,N) + eye(N));
 inv_Omega = Omega^-1;
 [G] = generate_G(N,M);
 sigma = [0:100:1000];
-for index = 1
-for noise_level = 1%1:length(sigma)
+for index = 51:100
+for noise_level = 1:length(sigma)
 sigma_t = sigma(noise_level)* 10^-9 * 3 * 10^5 ;
 noise_t0 = randn(M,1);
 noise_t = (sigma_t*G*noise_t0)';
 tau = generate_tau(M,R,fc1,fc2,fc3,rm1,rm2,rm3,rb1,rb2,rb3,ym1,ym2,ym3,f,beta0) + noise_t;
-%[tau] = generate_tau(M,R,fc1,fc2,fc3,rm1,rm2,rm3,rb1,rb2,rb3,ym1,ym2,ym3,f,beta);
-% [P D] = SumPD(R,fc1,fc2,fc3,rm1,rm2,rm3,rb1,rb2,rb3,ym1,ym2,ym3,f,beta);
-% obj = (G*P'-tau')'*inv_Omega*(G*P'-tau');
-tic
 [x beta obj] = GPGD(M,R,G,tau,inv_Omega,Lower,Upper,max_dis,min_dis,XYZ,n,p_P,p_D,0);
-toc
-dis = norm(x - emitter')
+dis = norm(x - emitter');
 fprintf(fid,"%2.2f,%d,%2.2f\n",noise_level,index,dis);
 end
 end
-%pltMCCRLB('realdata_log.txt','*k-')
+pltMCCRLB('exp/exp1.txt','*k-')
