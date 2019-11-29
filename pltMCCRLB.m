@@ -19,6 +19,8 @@ z = 10^3*[min_err' max_err'];
 h = area(sigma,z);
 h(1).FaceColor = [1 1 1];
 h(2).FaceColor = [216 233 241]/255;
+set(h,'FaceAlpha',0.5)
+set(h,'EdgeAlpha',0)
 hold on
 pointer = plot(sigma,10^3*err_mean,'ok-','linewidth',1.1,'markerfacecolor',[36, 169, 225]/255);
 legend(pointer,'Mean Value');
