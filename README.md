@@ -1,3 +1,7 @@
+#Code for Over-the-horizon Radar
+Published by Sen Huang
+Email: hsen@se.cuhk.edu.hk
+IDE: MATLAB R2019a
 # Multi-layer-QP-model
 ## main.m: test the GPGD.
 ## MonteCarlo.m: Monte Carlo simulation.
